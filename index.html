@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BahrainDeals — Local Deals & Offers</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#f5f7fb;color:#14161a}
+header{background:#0c1118;color:white;padding:15px 6%;display:flex;align-items:center;justify-content:space-between;gap:20px;position:sticky;top:0;z-index:20}
+.logo{font-weight:950;font-size:25px;letter-spacing:-1px}.logo b{color:#e31b3f}.nav{display:flex;gap:9px;align-items:center}.nav button,.hero button,.business button{border:0;border-radius:10px;padding:11px 16px;font-weight:800;cursor:pointer}.add{background:#e31b3f;color:#fff}
+.hero{background:linear-gradient(120deg,#0c1118,#202c3b);color:#fff;padding:62px 6% 50px}.hero small{color:#ffcb05;font-weight:900;text-transform:uppercase;letter-spacing:2px}.hero h1{font-size:clamp(38px,6vw,68px);max-width:800px;line-height:1;margin:12px 0}.hero p{color:#d7dce3;font-size:18px;max-width:650px}.search{display:flex;max-width:800px;margin-top:25px}.search input{flex:1;padding:16px;border:0;border-radius:12px 0 0 12px;font-size:16px}.search button{border-radius:0 12px 12px 0;background:#ffcb05;color:#111}
+main{max-width:1400px;margin:auto;padding:32px 6%}.sectionhead{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:12px 0 20px}.sectionhead h2{margin:0}.filters{display:flex;gap:9px;overflow:auto;padding-bottom:8px}.filter{white-space:nowrap;background:#fff;border:1px solid #e1e5ea;border-radius:999px;padding:9px 14px;cursor:pointer}.filter.active{background:#0c1118;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:20px}.card{background:white;border:1px solid #e4e7eb;border-radius:18px;overflow:hidden;box-shadow:0 8px 25px #1018280a}.pic{height:155px;display:flex;align-items:center;justify-content:center;font-size:55px;background:linear-gradient(135deg,#edf0f4,#fff);position:relative}.featured{position:absolute;left:12px;top:12px;background:#ffcb05;color:#111;border-radius:8px;padding:6px 9px;font-size:11px;font-weight:900}.body{padding:18px}.tag{font-size:11px;font-weight:900;color:#d7193f;background:#fff0f3;border-radius:99px;padding:5px 9px}.body h3{margin:12px 0 6px;font-size:18px}.muted{color:#6b7280;font-size:14px}.price{font-size:23px;font-weight:950;margin-top:13px}.old{text-decoration:line-through;color:#9aa1aa;font-size:13px;font-weight:500;margin-left:5px}.save{color:#15803d;font-size:12px;font-weight:800}.body button{width:100%;margin-top:14px;padding:12px;border:0;border-radius:10px;background:#0c1118;color:#fff;font-weight:850;cursor:pointer}
+.banner{margin:45px 0;background:#fff;border:1px solid #e2e6eb;border-radius:20px;padding:28px;display:flex;justify-content:space-between;align-items:center;gap:20px}.banner h2{margin:0 0 7px}.business button{background:#e31b3f;color:#fff}
+footer{background:#0c1118;color:#aeb6c2;padding:35px 6%;margin-top:30px}.footerlogo{color:#fff;font-weight:900;font-size:22px;margin-bottom:8px}
+.modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal.show{display:flex}.box{background:#fff;border-radius:18px;padding:25px;max-width:540px;width:100%;max-height:90vh;overflow:auto}.box h2{margin-top:0}.box input,.box select,.box textarea{width:100%;padding:12px;margin:6px 0 11px;border:1px solid #dce1e7;border-radius:9px;font:inherit}.row{display:flex;gap:10px}.row>*{flex:1}.actions{display:flex;gap:10px}.actions button{flex:1;padding:12px;border:0;border-radius:9px;font-weight:800;cursor:pointer}.primary{background:#0c1118;color:#fff}.secondary{background:#e9edf2}.empty{text-align:center;padding:45px;color:#6b7280}
+@media(max-width:650px){header{padding:13px 4%}.nav span{display:none}.hero,main{padding-left:4%;padding-right:4%}.banner{flex-direction:column;align-items:flex-start}.search{flex-direction:column;gap:8px}.search input,.search button{border-radius:10px}}
+</style>
+</head>
+<body>
+<header><div class="logo">Bahrain<span>Deals</span></div><div class="nav"><button onclick="openModal('business')">For Businesses</button><button class="add" onclick="openModal('deal')">+ Add Deal</button></div></header>
+<section class="hero"><small>🇧🇭 Bahrain's local deals</small><h1>Save more. Shop local.</h1><p>Discover discounts and special offers from businesses across Bahrain.</p><div class="search"><input id="q" placeholder="Search restaurants, fashion, electronics..." oninput="render()"><button onclick="document.getElementById('q').focus()">Search</button></div></section>
+<main>
+<div class="sectionhead"><h2>🔥 Featured deals</h2><span class="muted" id="count"></span></div><div class="filters" id="filters"></div>
+<div class="grid" id="grid"></div>
+<div class="banner"><div><h2>🏪 Own a business?</h2><div class="muted">Get your offer in front of local shoppers and grow your business.</div></div><div class="business"><button onclick="openModal('business')">List my business</button></div></div>
+</main>
+<footer><div class="footerlogo">BahrainDeals</div>Local deals, offers and promotions across Bahrain.<br><br>© 2026 BahrainDeals</footer>
+
+<div class="modal" id="modal"><div class="box" id="modalbox"></div></div>
+<script>
+const icon={Food:"🍔",Fashion:"👕",Electronics:"📱",Entertainment:"🎮",Beauty:"💄",Services:"🛠️",Other:"🏷️"};
+let deals=JSON.parse(localStorage.getItem("bdpro")||"null")||[
+{name:"The Burger Spot",title:"20% off burgers & meals",price:2.8,old:3.5,cat:"Food",loc:"Juffair",featured:true},
+{name:"Streetwear BH",title:"Up to 40% off selected hoodies",price:15,old:25,cat:"Fashion",loc:"Seef",featured:true},
+{name:"Tech Corner",title:"Wireless earbuds special",price:12.9,old:19.9,cat:"Electronics",loc:"Manama",featured:false},
+{name:"Game Zone",title:"Weekend gaming pass",price:5,old:8,cat:"Entertainment",loc:"Riffa",featured:true},
+{name:"Glow Studio",title:"Beauty bundle offer",price:9.5,old:15,cat:"Beauty",loc:"Isa Town",featured:false},
+{name:"FixIt Bahrain",title:"15% off phone repairs",price:8,old:10,cat:"Services",loc:"Muharraq",featured:false}
+];
+let active="All";
+function save(){localStorage.setItem("bdpro",JSON.stringify(deals))}
+function render(){
+let cats=["All",...new Set(deals.map(x=>x.cat))];
+filters.innerHTML=cats.map(c=>`<button class="filter ${c==active?"active":""}" onclick="active='${c}';render()">${c}</button>`).join("");
+let q=document.getElementById("q").value.toLowerCase();
+let list=deals.filter(x=>(active=="All"||x.cat==active)&&`${x.name} ${x.title} ${x.cat} ${x.loc}`.toLowerCase().includes(q));
+count.textContent=list.length+" deals";
+grid.innerHTML=list.length?list.map((x,i)=>`<article class="card"><div class="pic">${x.featured?'<span class="featured">FEATURED</span>':''}${icon[x.cat]||"🏷️"}</div><div class="body"><span class="tag">${x.cat}</span><h3>${esc(x.title)}</h3><div class="muted"><b>${esc(x.name)}</b> · ${esc(x.loc)}</div><div class="price">BHD ${(+x.price).toFixed(2)} <span class="old">BHD ${(+x.old).toFixed(2)}</span></div><div class="save">Save BHD ${(+x.old-+x.price).toFixed(2)}</div><button onclick="claim('${esc(x.name)}')">View Deal</button></div></article>`).join(""):'<div class="empty">No deals match your search.</div>';
+}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function openModal(type){
+modal.classList.add("show");
+modalbox.innerHTML=type=="deal"?`<h2>Add a Deal</h2><p class="muted">Create a deal for this demo site. Later this can connect to a real database.</p><input id="bn" placeholder="Business name"><input id="bt" placeholder="Deal title"><div class="row"><input id="bp" type="number" placeholder="Deal price (BHD)"><input id="bo" type="number" placeholder="Original price (BHD)"></div><select id="bc"><option>Food</option><option>Fashion</option><option>Electronics</option><option>Entertainment</option><option>Beauty</option><option>Services</option><option>Other</option></select><input id="bl" placeholder="Location in Bahrain"><div class="actions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="addDeal()">Publish</button></div>`:
+`<h2>List your business</h2><p class="muted">Tell us about your business. In a real launch, these submissions would go to your admin dashboard.</p><input id="biz" placeholder="Business name"><input id="owner" placeholder="Your name"><input id="phone" placeholder="Phone / WhatsApp"><input id="email" placeholder="Email"><input id="area" placeholder="Business area in Bahrain"><textarea id="offer" rows="4" placeholder="What deal do you want to advertise?"></textarea><div class="actions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="submitBiz()">Send request</button></div>`;
+}
+function closeModal(){modal.classList.remove("show")}
+function addDeal(){let x={name:bn.value.trim(),title:bt.value.trim(),price:+bp.value,old:+bo.value,cat:bc.value,loc:bl.value.trim(),featured:false};if(!x.name||!x.title||!x.price||!x.old||!x.loc){alert("Please fill everything in.");return}deals.unshift(x);save();closeModal();render()}
+function submitBiz(){if(!biz.value.trim()||!owner.value.trim()||!phone.value.trim()||!offer.value.trim()){alert("Please fill the required fields.");return}closeModal();alert("Thanks! Your business request has been saved for this demo.")}
+function claim(name){alert("Deal selected from "+name+". In the full version, this can open a coupon code or business page.")}
+render();
+</script>
+</body></html>
